@@ -1,0 +1,53 @@
+.card {
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  padding: 18px 18px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.eyebrow {
+  margin: 0;
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.title {
+  margin: 0 0 4px;
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.item {
+  padding: 12px 0 14px;
+  border-top: 1px solid var(--border);
+}
+
+.item:first-of-type {
+  border-top: none;
+  padding-top: 0;
+}
+
+.degree {
+  margin: 0 0 4px;
+  font-size: 0.98rem;
+  font-weight: 700;
+}
+
+.school {
+  margin: 0 0 6px;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.period {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--muted);
+}

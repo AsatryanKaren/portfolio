@@ -1,0 +1,79 @@
+---
+description: TypeScript, ESLint, Ant Design UI, CSS modules, component folders, small diffs
+alwaysApply: true
+---
+
+# Project standards
+
+## TypeScript (strict)
+
+- Honor `tsconfig.app.json`: `strict`, `noUnusedLocals`, `noUnusedParameters`, `noFallthroughCasesInSwitch`, and `noUncheckedSideEffectImports`.
+- Avoid `any` and unsafe casts; narrow types with guards and discriminated unions.
+- Prefer explicit types for exported APIs and non-obvious function signatures.
+
+## ESLint
+
+- Follow `eslint.config.js` (typescript-eslint recommended, React Hooks, react-refresh). Do **not** add `eslint-disable` / `eslint-disable-next-line` (or file-level disables). Fix the underlying issue instead.
+- After substantive edits, run `npm run lint` and resolve new violations in touched files.
+
+## UI: Ant Design (`antd`)
+
+- This app uses **Ant Design 5** (`antd`, `@ant-design/icons`). **Default to Ant Design components** for UI: layout (`Layout`, `Space`, `Flex`), surfaces (`Card`), actions (`Button`, `Dropdown`), forms (`Form`, `Input`, `Select`), feedback (`Modal`, `message`), typography (`Typography`), navigation patterns, etc.
+- Use **native semantic HTML** only when there is no good Ant equivalent (e.g. `main`, `article`, `section`, `header`, `footer`) or for minimal structure — still apply **CSS modules** and `className`, not `style={{}}`.
+- Prefer **`Typography.Text` / `Typography.Paragraph` / `Typography.Title`** for copy and inline code via `Typography.Text code` where it matches the design.
+- New screens and components should **compose Ant Design** instead of rebuilding buttons, cards, or form controls from scratch unless there is a clear reason.
+- Respect the existing **`AppThemeProvider`** / `ConfigProvider` theme (dark/light); do not bypass global tokens without a deliberate design reason.
+
+## Styling: no inline styles
+
+- Do not use the JSX `style={{ ... }}` prop (including on Ant Design components). Use `className`, Ant Design **`classNames`** / **`styles` props** where the API supports module classes, and a co-located stylesheet (CSS Modules: `styles.module.css`).
+- Prefer CSS variables from `src/index.css` (`var(--…)`) and Ant Design theme tokens over one-off magic values when it stays maintainable.
+
+## Component folders (colocation)
+
+Each UI component lives in its **own folder**, named after the component (PascalCase, matching the component name). Inside that folder:
+
+| Role | Typical file |
+|------|----------------|
+| Entry / component | `index.tsx` |
+| Styles | `styles.module.css` (or `.css`) — imported from `index.tsx` |
+| Constants | `consts.ts` |
+| Helpers | `utils.ts` (or a `utils/` folder if multiple modules are needed) |
+| Types (optional) | `types.ts` |
+
+- Import the component from elsewhere via the folder path (e.g. `import { AboutPage } from "@/pages/AboutPage"` resolves to `AboutPage/index.tsx`).
+- Do not add one-off `ComponentName.tsx` files next to the folder for the same component; keep a single home for that component’s code.
+
+## Changes stay small
+
+- One concern per change: no unrelated refactors, renames, or broad formatting-only edits mixed with a feature or fix.
+
+## Example (folder layout + Ant Design + CSS modules)
+
+```
+src/components/ExampleCard/
+  index.tsx
+  styles.module.css
+  consts.ts
+  utils.ts
+```
+
+```tsx
+// index.tsx — Ant Design for UI; classNames from CSS modules, not style={{ }}
+import { Button, Card, Space, Typography } from "antd";
+import styles from "./styles.module.css";
+
+const { Title, Paragraph } = Typography;
+
+export function ExampleCard() {
+  return (
+    <Card className={styles.card} title={<span className={styles.title}>Title</span>}>
+      <Space direction="vertical" size="middle">
+        <Title level={4}>Heading</Title>
+        <Paragraph type="secondary">Body copy.</Paragraph>
+        <Button type="primary">Action</Button>
+      </Space>
+    </Card>
+  );
+}
+```

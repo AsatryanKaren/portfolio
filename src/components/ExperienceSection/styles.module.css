@@ -1,0 +1,140 @@
+.section {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 56px clamp(16px, 4vw, 40px) 24px;
+}
+
+.headRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr);
+  gap: 20px;
+  align-items: end;
+  margin-bottom: 28px;
+}
+
+.eyebrow {
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--accent);
+  margin: 0 0 8px;
+}
+
+.title {
+  margin: 0;
+  font-size: clamp(1.8rem, 3.4vw, 2.4rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.caption {
+  margin: 0;
+  font-size: 0.98rem;
+  line-height: 1.55;
+  color: var(--muted);
+  justify-self: end;
+  text-align: right;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 18px;
+  border: 1px solid var(--border);
+  background: linear-gradient(
+      135deg,
+      rgba(15, 23, 42, 0.95),
+      rgba(15, 23, 42, 0.78)
+    ),
+    var(--surface);
+  padding: clamp(20px, 3vw, 28px);
+}
+
+.cardInner {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 18px 28px;
+}
+
+.roleLabel {
+  grid-column: 1 / -1;
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.company {
+  margin: 0 0 10px;
+  font-size: 1.35rem;
+  font-weight: 700;
+}
+
+.description {
+  margin: 0;
+  font-size: 0.98rem;
+  line-height: 1.65;
+  color: var(--muted);
+  max-width: 720px;
+}
+
+.meta {
+  text-align: right;
+  font-size: 0.92rem;
+  color: var(--text);
+}
+
+.metaMuted {
+  display: block;
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
+.watermark {
+  position: absolute;
+  right: -6%;
+  bottom: -18%;
+  font-size: 180px;
+  color: rgba(148, 163, 184, 0.07);
+  pointer-events: none;
+  z-index: 0;
+}
+
+@media (max-width: 900px) {
+  .headRow {
+    grid-template-columns: 1fr;
+  }
+
+  .caption {
+    justify-self: start;
+    text-align: left;
+  }
+
+  .cardInner {
+    grid-template-columns: 1fr;
+  }
+
+  .meta {
+    text-align: left;
+  }
+}
+
+html[data-theme="light"] .card {
+  background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.96),
+      rgba(248, 250, 252, 0.92)
+    ),
+    var(--surface);
+}
