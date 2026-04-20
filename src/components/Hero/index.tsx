@@ -6,9 +6,8 @@ import {
   HEADLINE_LEAD,
   HEADLINE_TAIL,
   HERO_IMAGE_ALT,
-  HIRE_BUTTON,
+  GEMINI_BUTTON,
   INTRO,
-  PROJECTS_BUTTON,
   RESUME_BUTTON,
   RESUME_HREF,
   ROLE_BADGE,
@@ -38,15 +37,9 @@ export function Hero() {
             </a>
             <Link
               className={`${styles.btn} ${styles.btnAccent}`}
-              to="/contact"
+              to="/gemini"
             >
-              {HIRE_BUTTON}
-            </Link>
-            <Link
-              className={`${styles.btn} ${styles.btnGhost}`}
-              to="/projects"
-            >
-              {PROJECTS_BUTTON}
+              {GEMINI_BUTTON}
             </Link>
           </div>
         </div>

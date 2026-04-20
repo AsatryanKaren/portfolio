@@ -11,9 +11,7 @@ export const INTRO =
 
 export const RESUME_BUTTON = "Download resume";
 
-export const HIRE_BUTTON = "Hire me";
-
-export const PROJECTS_BUTTON = "View projects";
+export const GEMINI_BUTTON = "Gemini";
 
 export const HERO_IMAGE_ALT = "Portrait illustration";
 
