@@ -1,6 +1,7 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 
 import { MainLayout } from "@/layouts/MainLayout";
+import { DidTalkPage } from "@/pages/DidTalkPage";
 import { GeminiPage } from "@/pages/GeminiPage";
 import { HomePage } from "@/pages/HomePage";
 
@@ -12,6 +13,7 @@ export default function App() {
       <Route path="/" element={<MainLayout />}>
         <Route index element={<HomePage />} />
         <Route path={childPath("gemini")} element={<GeminiPage />} />
+        <Route path={childPath("did")} element={<DidTalkPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>
     </Routes>
