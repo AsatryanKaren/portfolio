@@ -12,8 +12,17 @@ import {
 } from "antd";
 
 import { sendContactMessage } from "@/api/emailjs";
+import {
+  isTelegramConfigured,
+  sendContactMessageViaTelegram,
+} from "@/api/telegram";
 
-import { PAGE_LEAD, PAGE_TITLE, SUCCESS_MESSAGE } from "./consts";
+import {
+  PAGE_LEAD,
+  PAGE_TITLE,
+  SUCCESS_MESSAGE,
+  TELEGRAM_SUCCESS_MESSAGE,
+} from "./consts";
 import styles from "./styles.module.css";
 
 const { Paragraph, Title } = Typography;
@@ -26,11 +35,12 @@ type ContactFormValues = {
 export function ContactPage() {
   const { message } = App.useApp();
   const [form] = Form.useForm<ContactFormValues>();
-  const [loading, setLoading] = useState(false);
+  const [sending, setSending] = useState<"email" | "telegram" | null>(null);
   const [apiError, setApiError] = useState<string | null>(null);
+  const telegramReady = isTelegramConfigured();
 
   const onFinish = async (values: ContactFormValues) => {
-    setLoading(true);
+    setSending("email");
     setApiError(null);
     try {
       await sendContactMessage({
@@ -45,7 +55,33 @@ export function ContactPage() {
         error instanceof Error ? error.message : "Email could not be sent.";
       setApiError(description);
     } finally {
-      setLoading(false);
+      setSending(null);
+    }
+  };
+
+  const onSendViaTelegram = async () => {
+    setApiError(null);
+    try {
+      const values = await form.validateFields();
+      setSending("telegram");
+      await sendContactMessageViaTelegram({
+        fromName: values.fromName.trim(),
+        message: values.message.trim(),
+      });
+      form.resetFields();
+      message.success(TELEGRAM_SUCCESS_MESSAGE);
+    } catch (error) {
+      if (error && typeof error === "object" && "errorFields" in error) {
+        return;
+      }
+      console.error(error);
+      const description =
+        error instanceof Error
+          ? error.message
+          : "Message could not be sent via Telegram.";
+      setApiError(description);
+    } finally {
+      setSending(null);
     }
   };
 
@@ -122,18 +158,42 @@ export function ContactPage() {
 
             <Form.Item>
               <Flex gap="small" wrap>
-                <Button type="primary" htmlType="submit" loading={loading}>
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  loading={sending === "email"}
+                  disabled={sending === "telegram"}
+                >
                   Send message
                 </Button>
                 <Button
                   htmlType="button"
-                  disabled={loading}
+                  loading={sending === "telegram"}
+                  disabled={!telegramReady || sending === "email"}
+                  onClick={() => {
+                    void onSendViaTelegram();
+                  }}
+                >
+                  Send via Telegram
+                </Button>
+                <Button
+                  htmlType="button"
+                  disabled={sending !== null}
                   onClick={() => form.resetFields()}
                 >
                   Reset
                 </Button>
               </Flex>
             </Form.Item>
+            {!telegramReady ? (
+              <Typography.Paragraph type="secondary" className={styles.helper}>
+                To enable <Typography.Text code>Send via Telegram</Typography.Text>
+                , set <Typography.Text code>VITE_TELEGRAM_BOT_TOKEN</Typography.Text>{" "}
+                and <Typography.Text code>VITE_TELEGRAM_CHAT_ID</Typography.Text>{" "}
+                in <Typography.Text code>.env.local</Typography.Text> (see{" "}
+                <Typography.Text code>.env.example</Typography.Text>).
+              </Typography.Paragraph>
+            ) : null}
           </Form>
         </Space>
       </Card>
