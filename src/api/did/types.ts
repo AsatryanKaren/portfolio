@@ -5,11 +5,29 @@ export type DidTalkStatus =
   | "error"
   | "rejected";
 
+/**
+ * Microsoft (Azure) neural TTS — see D-ID `script.provider` and
+ * [Azure voice list](https://learn.microsoft.com/azure/ai-services/speech-service/language-support?tabs=tts).
+ */
+export type DidMicrosoftTtsProvider = {
+  type: "microsoft";
+  voice_id: string;
+  voice_config?: {
+    style?: string;
+    rate?: string;
+    pitch?: string;
+  };
+  language?: string;
+};
+
+export type DidTtsProvider = DidMicrosoftTtsProvider;
+
 export type DidTextScript = {
   type: "text";
   input: string;
   subtitles?: boolean;
   ssml?: boolean;
+  provider?: DidTtsProvider;
 };
 
 export type DidCreateTalkRequest = {

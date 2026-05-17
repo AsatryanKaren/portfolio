@@ -6,14 +6,18 @@ import {
   Flex,
   Form,
   Input,
+  Select,
   Space,
   Typography,
   message,
 } from "antd";
 
 import { createTalk, pollTalkUntilTerminal } from "@/api/did";
+import type { DidMicrosoftTtsProvider } from "@/api/did/types";
 
 import {
+  AZURE_VOICE_OPTIONS,
+  DEFAULT_AZURE_VOICE_ID,
   DEFAULT_SCRIPT,
   DEFAULT_SOURCE_URL,
   PAGE_TITLE,
@@ -25,6 +29,8 @@ const { Paragraph, Text, Title } = Typography;
 type DidTalkFormValues = {
   sourceUrl: string;
   script: string;
+  voiceId: string;
+  talkStyle?: string;
 };
 
 export function DidTalkPage() {
@@ -36,10 +42,14 @@ export function DidTalkPage() {
   const [apiError, setApiError] = useState<string | null>(null);
 
   const sourceUrlWatch = Form.useWatch("sourceUrl", form);
+  const voiceIdWatch = Form.useWatch("voiceId", form);
   const displayPreviewUrl =
     typeof sourceUrlWatch === "string" && sourceUrlWatch.trim().length > 0
       ? sourceUrlWatch.trim()
       : null;
+
+  const selectedVoice = AZURE_VOICE_OPTIONS.find((o) => o.value === voiceIdWatch);
+  const talkStyleChoices = selectedVoice?.styles;
 
   const onFinish = async (values: DidTalkFormValues) => {
     setLoading(true);
@@ -49,11 +59,27 @@ export function DidTalkPage() {
     setPollStatus(null);
 
     try {
+      const voiceId = values.voiceId.trim();
+      const voiceMeta = AZURE_VOICE_OPTIONS.find((o) => o.value === voiceId);
+      const provider: DidMicrosoftTtsProvider = {
+        type: "microsoft",
+        voice_id: voiceId,
+      };
+      if (
+        voiceMeta?.styles &&
+        voiceMeta.styles.length > 0 &&
+        typeof values.talkStyle === "string" &&
+        values.talkStyle.trim().length > 0
+      ) {
+        provider.voice_config = { style: values.talkStyle.trim() };
+      }
+
       const created = await createTalk({
         source_url: values.sourceUrl.trim(),
         script: {
           type: "text",
           input: values.script.trim(),
+          provider,
         },
       });
       setTalkId(created.id);
@@ -106,7 +132,8 @@ export function DidTalkPage() {
               >
                 Get talk
               </Typography.Link>
-              : a public HTTPS image URL (jpg/png) plus text for TTS/lip-sync. Set{" "}
+              : a public HTTPS image URL (jpg/png) plus text for TTS/lip-sync (Azure neural
+              voice via <Typography.Text code>provider.type: microsoft</Typography.Text>). Set{" "}
               <Typography.Text code>VITE_DID_API_KEY</Typography.Text> in{" "}
               <Typography.Text code>.env.local</Typography.Text> (see{" "}
               <Typography.Text code>.env.example</Typography.Text>).
@@ -151,6 +178,7 @@ export function DidTalkPage() {
             initialValues={{
               sourceUrl: DEFAULT_SOURCE_URL,
               script: DEFAULT_SCRIPT,
+              voiceId: DEFAULT_AZURE_VOICE_ID,
             }}
             onFinish={(v) => void onFinish(v)}
           >
@@ -177,6 +205,64 @@ export function DidTalkPage() {
                   />
                 </div>
               </div>
+            ) : null}
+
+            <Form.Item
+              label="Voice (Microsoft TTS)"
+              name="voiceId"
+              extra={
+                <>
+                  D-ID passes this as Microsoft TTS; standard ids match{" "}
+                  <Typography.Link
+                    href="https://learn.microsoft.com/azure/ai-services/speech-service/language-support?tabs=tts"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Azure neural voices
+                  </Typography.Link>
+                  . Multi-style MAI voices use the id from the D-ID / Microsoft gallery (see{" "}
+                  <Typography.Link
+                    href="https://docs.d-id.com/reference/tts-microsoft"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    D-ID Microsoft TTS
+                  </Typography.Link>
+                  ).
+                </>
+              }
+              rules={[{ required: true, message: "Choose a voice." }]}
+            >
+              <Select
+                showSearch
+                optionFilterProp="label"
+                options={AZURE_VOICE_OPTIONS.map((o) => ({
+                  value: o.value,
+                  label: `${o.label} (${o.value})`,
+                }))}
+                placeholder="Select voice"
+              />
+            </Form.Item>
+
+            {talkStyleChoices && talkStyleChoices.length > 0 ? (
+              <Form.Item
+                label="Talk style"
+                name="talkStyle"
+                initialValue="anger"
+                preserve={false}
+                extra="Sent as provider.voice_config.style (Microsoft expressive / MAI)."
+                rules={[{ required: true, message: "Choose a talk style." }]}
+              >
+                <Select
+                  showSearch
+                  optionFilterProp="label"
+                  options={talkStyleChoices.map((s) => ({
+                    value: s,
+                    label: `${s.charAt(0).toUpperCase()}${s.slice(1)}`,
+                  }))}
+                  placeholder="Select style"
+                />
+              </Form.Item>
             ) : null}
 
             <Form.Item
