@@ -2,4 +2,5 @@
 export const ROUTES = {
   gemini: "gemini",
   did: "did",
+  contact: "contact",
 } as const;

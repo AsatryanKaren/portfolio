@@ -5,7 +5,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { ConfigProvider, theme as antdTheme } from "antd";
+import { App, ConfigProvider, theme as antdTheme } from "antd";
 
 import { ThemeContext } from "./context";
 import { oppositeMode, persistTheme, readStoredTheme } from "./utils";
@@ -67,7 +67,9 @@ export function AppThemeProvider({ children }: AppThemeProviderProps) {
 
   return (
     <ThemeContext.Provider value={context}>
-      <ConfigProvider theme={antdThemeConfig}>{children}</ConfigProvider>
+      <ConfigProvider theme={antdThemeConfig}>
+        <App>{children}</App>
+      </ConfigProvider>
     </ThemeContext.Provider>
   );
 }
